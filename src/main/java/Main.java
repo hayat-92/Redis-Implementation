@@ -1,4 +1,5 @@
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 
@@ -16,6 +17,10 @@ public class Main {
           serverSocket.setReuseAddress(true);
           // Wait for connection from client.
           clientSocket = serverSocket.accept();
+          try(PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true)){
+            out.print("+PONG\r\n");
+            out.flush();
+          }
         } catch (IOException e) {
           System.out.println("IOException: " + e.getMessage());
         } finally {
