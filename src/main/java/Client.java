@@ -28,7 +28,7 @@ public class Client implements Runnable {
     public String get(String key, Map<String, String> map, Map<String, Long> expireMap) {
         if (expireMap.containsKey(key)) {
             Long expire = expireMap.get(key);
-            if (expire > System.currentTimeMillis()) {
+            if (expire < System.currentTimeMillis()) {
                 map.remove(key);
                 expireMap.remove(key);
                 return "$-1\r\n";
