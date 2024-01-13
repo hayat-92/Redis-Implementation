@@ -72,7 +72,7 @@ public class Client implements Runnable {
                         String key = elements.get(4);
                         String value = elements.get(6);
                         Long expire = null;
-                        if(elements.size() > 8){
+                        if(elements.size() == 11){
                             String expireStr = elements.get(10);
                             expire = Long.parseLong(expireStr);
                         }
