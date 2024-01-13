@@ -4,7 +4,9 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class Client implements Runnable {
 
@@ -15,6 +17,7 @@ public class Client implements Runnable {
     }
 
     public void run() {
+        Map<String, String> map = new HashMap<String, String>();
         try (
                 BufferedReader in = new BufferedReader(
                         new InputStreamReader(clientSocket.getInputStream()));
@@ -38,6 +41,22 @@ public class Client implements Runnable {
                         // $3\r\nhey\r\n
                         out.printf("$%d\r\n%s\r\n", message.length(), message);
                         out.flush();
+                    }else if(command.equals("set")){
+                        String key = elements.get(4);
+                        String value = elements.get(6);
+                        map.put(key, value);
+                        out.print("+OK\r\n");
+                        out.flush();
+                    }else if(command.equals("get")){
+                        String key = elements.get(4);
+                        if(map.containsKey(key)) {
+                            String value = map.get(key);
+                            out.printf("$%d\r\n%s\r\n", value.length(), value);
+                            out.flush();
+                        }else{
+                            out.print("$-1\r\n");
+                            out.flush();
+                        }
                     }
                     elements.clear();
                     elementCount = 0;
