@@ -84,6 +84,17 @@ public class Client implements Runnable {
                         String str = get(key, map, expireMap);
                         out.print(str);
                         out.flush();
+                    } else if (command.equals("config")) {
+                        String key = elements.get(6);
+                        String value = Main.config.get(key);
+                        if (value == null) {
+                            out.print("$-1\r\n");
+                            out.flush();
+                        } else {
+                            out.printf("*2\r\n$3\r\ndir\r\n$%d\r\n%s\r\n", value.length(), value);
+                            out.flush();
+                        }
+
                     }
                     elements.clear();
                     elementCount = 0;

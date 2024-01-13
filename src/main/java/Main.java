@@ -4,10 +4,23 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Main {
+    public static Map<String, String> config = new HashMap<String, String>();
     public static void main(String[] args) {
         System.out.println("Logs from your program will appear here!");
+
+        for (int i = 0; i < args.length; i++) {
+            String arg = args[i];
+            if (arg.equals("--dir")) {
+                config.put("dir", args[++i]);
+            }
+            if (arg.equals("--dbfilename")) {
+                config.put("dbfilename", args[++i]);
+            }
+        }
 
         ServerSocket serverSocket = null;
         Socket clientSocket = null;
