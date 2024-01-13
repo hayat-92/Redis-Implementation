@@ -29,7 +29,7 @@ public class Main {
                 while ((inputLine = in.readLine()) != null) {
                     System.out.println("Client Command : " + inputLine);
                     if (inputLine.equals("ping")) {
-                        out.println("+PONG\r\n");
+                        out.print("+PONG\r\n");
                         out.flush();
                     }
                 }
