@@ -18,24 +18,31 @@ public class Client implements Runnable {
         try (
                 BufferedReader in = new BufferedReader(
                         new InputStreamReader(clientSocket.getInputStream()));
-                PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
+                PrintWriter out = new PrintWriter(clientSocket.getOutputStream());
         ) {
-            String inputLine;
-            List<String> commandList = new ArrayList<>();
-            while ((inputLine = in.readLine()) != null) {
-                commandList.add(inputLine);
-//                System.out.println(inputLine);
-                if (commandList.size()==1 && commandList.get(0).equalsIgnoreCase("ping")) {
-                    out.println("+PONG");
-                    out.flush();
-                } else if (commandList.size() - 3 >=0 && commandList.get(commandList.size() - 3).equalsIgnoreCase("echo")) {
-                    int len = Integer.parseInt(commandList.get(commandList.size() - 2).substring(1));
-                    out.println("$" + len + commandList.get(commandList.size() - 1));
-                    out.flush();
+            List<String> elements = new ArrayList<String>();
+            int elementCount = 0;
+            String line;
+            while ((line = in.readLine()) != null) {
+                elements.add(line);
+                if (elements.size() == 1) {
+                    elementCount = 1 + 2 * Integer.parseInt(line.substring(1));
+                }
+                if (elements.size() == elementCount) {
+                    String command = elements.get(2);
+                    if (command.equals("ping")) {
+                        out.print("+PONG\r\n");
+                        out.flush();
+                    } else if (command.equals("echo")) {
+                        String message = elements.get(4);
+                        // $3\r\nhey\r\n
+                        out.printf("$%d\r\n%s\r\n", message.length(), message);
+                        out.flush();
+                    }
+                    elements.clear();
+                    elementCount = 0;
                 }
             }
-            System.out.println("Faisal");
-            System.out.println("Received command: " + commandList.get(commandList.size() - 1));
 
         } catch (IOException e) {
             System.out.println("IOException: " + e.getMessage());
