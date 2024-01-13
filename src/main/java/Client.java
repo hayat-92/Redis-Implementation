@@ -19,7 +19,7 @@ public class Client implements Runnable {
     public String set(String key, String value, Long expire, Map<String, String> map, Map<String, Long> expireMap) {
         map.put(key, value);
         if (expire != null) {
-            expireMap.put(key, expire);
+            expireMap.put(key, System.currentTimeMillis() + expire);
         }
         return "+OK\r\n";
 
