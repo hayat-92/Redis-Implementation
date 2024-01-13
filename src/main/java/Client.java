@@ -16,12 +16,12 @@ public class Client implements Runnable {
         this.clientSocket = clientSocket;
     }
 
-    public String set(String key, String value, Long expire, Map map, Map expireMap){
+    public String set(String key, String value, Long expire, Map<String, String> map, Map<String, Long> expireMap){
         map.put(key, value);
         if(expire != null){
             expireMap.put(key, expire);
         }
-        return "Ok/r/n";
+        return "Ok\r\n";
 
     }
 
