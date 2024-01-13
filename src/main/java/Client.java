@@ -21,7 +21,7 @@ public class Client implements Runnable {
         if(expire != null){
             expireMap.put(key, expire);
         }
-        return "Ok\r\n";
+        return "+Ok\r\n";
 
     }
 
