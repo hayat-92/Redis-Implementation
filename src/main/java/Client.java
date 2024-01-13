@@ -16,28 +16,28 @@ public class Client implements Runnable {
         this.clientSocket = clientSocket;
     }
 
-    public String set(String key, String value, Long expire, Map<String, String> map, Map<String, Long> expireMap){
+    public String set(String key, String value, Long expire, Map<String, String> map, Map<String, Long> expireMap) {
         map.put(key, value);
-        if(expire != null){
+        if (expire != null) {
             expireMap.put(key, expire);
         }
         return "+OK\r\n";
 
     }
 
-    public String get(String key, Map map, Map expireMap){
-        if(expireMap.containsKey(key)){
-            Long expire = (Long)expireMap.get(key);
-            if(expire < System.currentTimeMillis()){
+    public String get(String key, Map map, Map expireMap) {
+        if (expireMap.containsKey(key)) {
+            Long expire = (Long) expireMap.get(key);
+            if (expire > System.currentTimeMillis()) {
                 map.remove(key);
                 expireMap.remove(key);
                 return "-1\r\n";
             }
         }
-        if(map.containsKey(key)){
-            String value = (String)map.get(key);
+        if (map.containsKey(key)) {
+            String value = (String) map.get(key);
             return "$" + value.length() + "\r\n" + value + "\r\n";
-        }else{
+        } else {
             return "-1\r\n";
         }
     }
@@ -68,18 +68,18 @@ public class Client implements Runnable {
                         // $3\r\nhey\r\n
                         out.printf("$%d\r\n%s\r\n", message.length(), message);
                         out.flush();
-                    }else if(command.equals("set")){
+                    } else if (command.equals("set")) {
                         String key = elements.get(4);
                         String value = elements.get(6);
                         Long expire = null;
-                        if(elements.size() == 11){
+                        if (elements.size() == 11) {
                             String expireStr = elements.get(10);
                             expire = Long.parseLong(expireStr);
                         }
                         String str = set(key, value, expire, map, expireMap);
                         out.print(str);
                         out.flush();
-                    }else if(command.equals("get")){
+                    } else if (command.equals("get")) {
                         String key = elements.get(4);
                         String str = get(key, map, expireMap);
                         out.print(str);
