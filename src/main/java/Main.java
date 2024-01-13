@@ -7,10 +7,8 @@ import java.net.Socket;
 
 public class Main {
     public static void main(String[] args) {
-        // You can use print statements as follows for debugging, they'll be visible when running tests.
         System.out.println("Logs from your program will appear here!");
 
-        //  Uncomment this block to pass the first stage
         ServerSocket serverSocket = null;
         Socket clientSocket = null;
         int port = 6379;
@@ -20,20 +18,8 @@ public class Main {
             // Wait for connection from client.
             clientSocket = serverSocket.accept();
 
-            try (
-                    BufferedReader in = new BufferedReader(
-                            new InputStreamReader(clientSocket.getInputStream()));
-                    PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
-            ) {
-                String inputLine;
-                while ((inputLine = in.readLine()) != null) {
-                    System.out.println("Client Command : " + inputLine);
-                    if (inputLine.equals("ping")) {
-                        out.print("+PONG\r\n");
-                        out.flush();
-                    }
-                }
-            }
+            Thread t1 = new Thread(new Client(clientSocket));
+            t1.start();
         } catch (IOException e) {
             System.out.println("IOException: " + e.getMessage());
         } finally {
