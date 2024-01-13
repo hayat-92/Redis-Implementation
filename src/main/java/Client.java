@@ -25,20 +25,20 @@ public class Client implements Runnable {
 
     }
 
-    public String get(String key, Map map, Map expireMap) {
+    public String get(String key, Map<String, String> map, Map<String, Long> expireMap) {
         if (expireMap.containsKey(key)) {
-            Long expire = (Long) expireMap.get(key);
+            Long expire = expireMap.get(key);
             if (expire > System.currentTimeMillis()) {
                 map.remove(key);
                 expireMap.remove(key);
-                return "-1\r\n";
+                return "$-1\r\n";
             }
         }
         if (map.containsKey(key)) {
-            String value = (String) map.get(key);
+            String value = map.get(key);
             return "$" + value.length() + "\r\n" + value + "\r\n";
         } else {
-            return "-1\r\n";
+            return "$-1\r\n";
         }
     }
 
