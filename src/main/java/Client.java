@@ -24,15 +24,19 @@ public class Client implements Runnable {
             List<String> commandList = new ArrayList<>();
             while ((inputLine = in.readLine()) != null) {
                 commandList.add(inputLine);
+//                System.out.println(inputLine);
+                if (commandList.size()==1 && commandList.get(0).equalsIgnoreCase("ping")) {
+                    out.println("+PONG");
+                    out.flush();
+                } else if (commandList.size() - 3 >=0 && commandList.get(commandList.size() - 3).equalsIgnoreCase("echo")) {
+                    int len = Integer.parseInt(commandList.get(commandList.size() - 2).substring(1));
+                    out.println("$" + len + commandList.get(commandList.size() - 1));
+                    out.flush();
+                }
             }
-            if (commandList.get(commandList.size() - 1).equalsIgnoreCase("ping")) {
-                out.println("+PONG");
-                out.flush();
-            } else if (commandList.get(commandList.size() - 3).equalsIgnoreCase("echo")) {
-                int len = Integer.parseInt(commandList.get(commandList.size() - 2).substring(1));
-                out.println("$" + len + commandList.get(commandList.size() - 1));
-                out.flush();
-            }
+            System.out.println("Faisal");
+            System.out.println("Received command: " + commandList.get(commandList.size() - 1));
+
         } catch (IOException e) {
             System.out.println("IOException: " + e.getMessage());
         } finally {
