@@ -16,8 +16,35 @@ public class Client implements Runnable {
         this.clientSocket = clientSocket;
     }
 
+    public String set(String key, String value, Long expire, Map map, Map expireMap){
+        map.put(key, value);
+        if(expire != null){
+            expireMap.put(key, expire);
+        }
+        return "Ok/r/n";
+
+    }
+
+    public String get(String key, Map map, Map expireMap){
+        if(expireMap.containsKey(key)){
+            Long expire = (Long)expireMap.get(key);
+            if(expire < System.currentTimeMillis()){
+                map.remove(key);
+                expireMap.remove(key);
+                return "$-1\r\n";
+            }
+        }
+        if(map.containsKey(key)){
+            String value = (String)map.get(key);
+            return "$" + value.length() + "\r\n" + value + "\r\n";
+        }else{
+            return "$-1\r\n";
+        }
+    }
+
     public void run() {
         Map<String, String> map = new HashMap<String, String>();
+        Map<String, Long> expireMap = new HashMap<String, Long>();
         try (
                 BufferedReader in = new BufferedReader(
                         new InputStreamReader(clientSocket.getInputStream()));
@@ -44,19 +71,19 @@ public class Client implements Runnable {
                     }else if(command.equals("set")){
                         String key = elements.get(4);
                         String value = elements.get(6);
-                        map.put(key, value);
-                        out.print("+OK\r\n");
+                        Long expire = null;
+                        if(elements.size() > 8){
+                            String expireStr = elements.get(10);
+                            expire = Long.parseLong(expireStr);
+                        }
+                        String str = set(key, value, expire, map, expireMap);
+                        out.print(str);
                         out.flush();
                     }else if(command.equals("get")){
                         String key = elements.get(4);
-                        if(map.containsKey(key)) {
-                            String value = map.get(key);
-                            out.printf("$%d\r\n%s\r\n", value.length(), value);
-                            out.flush();
-                        }else{
-                            out.print("$-1\r\n");
-                            out.flush();
-                        }
+                        String str = get(key, map, expireMap);
+                        out.print(str);
+                        out.flush();
                     }
                     elements.clear();
                     elementCount = 0;
