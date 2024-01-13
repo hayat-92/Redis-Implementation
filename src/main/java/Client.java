@@ -31,14 +31,14 @@ public class Client implements Runnable {
             if(expire < System.currentTimeMillis()){
                 map.remove(key);
                 expireMap.remove(key);
-                return "$-1\r\n";
+                return "-1\r\n";
             }
         }
         if(map.containsKey(key)){
             String value = (String)map.get(key);
             return "$" + value.length() + "\r\n" + value + "\r\n";
         }else{
-            return "$-1\r\n";
+            return "-1\r\n";
         }
     }
 
