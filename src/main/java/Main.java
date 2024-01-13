@@ -16,10 +16,13 @@ public class Main {
             serverSocket = new ServerSocket(port);
             serverSocket.setReuseAddress(true);
             // Wait for connection from client.
-            clientSocket = serverSocket.accept();
+            while (true) {
 
-            Thread t1 = new Thread(new Client(clientSocket));
-            t1.start();
+                clientSocket = serverSocket.accept();
+
+                Thread t1 = new Thread(new Client(clientSocket));
+                t1.start();
+            }
         } catch (IOException e) {
             System.out.println("IOException: " + e.getMessage());
         } finally {
