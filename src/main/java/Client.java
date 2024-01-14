@@ -1,8 +1,7 @@
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
+import java.io.*;
 import java.net.Socket;
+import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -40,6 +39,25 @@ public class Client implements Runnable {
         } else {
             return "$-1\r\n";
         }
+    }
+
+    public static int lengthEncoding(InputStream is, int b) throws IOException {
+        int length = 100;
+        int first2bits = b & 11000000;
+        if (first2bits == 0) {
+            length = 1;
+        } else if (first2bits == 01000000) {
+            length = 2;
+        } else if (first2bits == 10000000) {
+            System.out.println("10");
+            ByteBuffer buffer = ByteBuffer.allocate(Integer.BYTES);
+            buffer.put(is.readNBytes(4));
+            buffer.rewind();
+            length = 1 + buffer.getInt();
+        } else if (first2bits == 11000000) {
+            length = 1;
+        }
+        return length;
     }
 
     public void run() {
@@ -95,6 +113,62 @@ public class Client implements Runnable {
                             out.flush();
                         }
 
+                    }else if (command.equals("keys")) {
+                        // *2 $4 keys $1 *
+                        String dir = Main.config.get("dir");
+                        String dbfilename = Main.config.get("dbfilename");
+                        String key = "foo";
+                        try (InputStream fis = new FileInputStream(new File(dir, dbfilename))) {
+                            byte[] redis = new byte[5];
+                            byte[] version = new byte[4];
+                            fis.read(redis);
+                            fis.read(version);
+                            System.out.println("Magic String = " + new String(redis, StandardCharsets.UTF_8));
+                            System.out.println("Version = " + new String(version, StandardCharsets.UTF_8));
+                            int b;
+                            header:
+                            while ((b = fis.read()) != -1) {
+                                switch (b) {
+                                    case 0xFF:
+                                        System.out.println("EOF");
+                                        break;
+                                    case 0xFE:
+                                        System.out.println("SELECTDB");
+                                        break;
+                                    case 0xFD:
+                                        System.out.println("EXPIRETIME");
+                                        break;
+                                    case 0xFC:
+                                        System.out.println("EXPIRETIMEMS");
+                                        break;
+                                    case 0xFB:
+                                        System.out.println("RESIZEDB");
+                                        b = fis.read();
+                                        fis.readNBytes(lengthEncoding(fis, b) - 1);
+                                        fis.readNBytes(lengthEncoding(fis, b) - 1);
+                                        break header;
+                                    case 0xFA:
+                                        System.out.println("AUX");
+                                        break;
+                                }
+                            }
+                            System.out.println("header done");
+                            // now key value pairs
+                            while ((b = fis.read()) != -1) { // value type
+                                System.out.println("value-type = " + b);
+                                b = fis.read();
+                                System.out.println(" b = " + Integer.toBinaryString(b));
+                                System.out.println("reading keys");
+                                int strLength = lengthEncoding(fis, b);
+                                if (strLength == 1) {
+                                    strLength = b & 00111111;
+                                }
+                                System.out.println("strLength == " + strLength);
+                                byte[] bytes = fis.readNBytes(strLength);
+                                key = new String(bytes);
+                                break;
+                            }
+                        }
                     }
                     elements.clear();
                     elementCount = 0;
