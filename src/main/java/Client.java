@@ -88,9 +88,13 @@ public class Client implements Runnable {
                                     break;
                             }
                         }
+                        b = fis.read();
                         System.out.println("header done");
                         // now key value pairs
                         while ((b = fis.read()) != -1) { // value type
+                            if (b == 0xFF) {
+                                break;
+                            }
                             String key = "";
                             String value = "";
                             System.out.println("value-type = " + b);
@@ -119,7 +123,6 @@ public class Client implements Runnable {
                             System.out.println("key = " + key + ".");
                             System.out.println("value = " + value + ".");
                             map.put(key, value);
-                            break;
                         }
                     }
                 }
