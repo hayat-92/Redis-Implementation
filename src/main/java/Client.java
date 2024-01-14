@@ -41,21 +41,24 @@ public class Client implements Runnable {
         }
     }
 
-    public static int lengthEncoding(InputStream is, int b) throws IOException {
+    private static int lengthEncoding(InputStream is, int b) throws IOException {
         int length = 100;
         int first2bits = b & 11000000;
         if (first2bits == 0) {
+            System.out.println("00");
             length = 1;
-        } else if (first2bits == 01000000) {
+        } else if (first2bits == 128) {
+            System.out.println("01");
             length = 2;
-        } else if (first2bits == 10000000) {
+        } else if (first2bits == 256) {
             System.out.println("10");
             ByteBuffer buffer = ByteBuffer.allocate(Integer.BYTES);
             buffer.put(is.readNBytes(4));
             buffer.rewind();
             length = 1 + buffer.getInt();
-        } else if (first2bits == 11000000) {
-            length = 1;
+        } else if (first2bits == 256 + 128) {
+            System.out.println("11");
+            length = 1; // special format
         }
         return length;
     }
