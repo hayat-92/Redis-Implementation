@@ -166,6 +166,7 @@ public class Client implements Runnable {
                                 System.out.println(" b = " + Integer.toBinaryString(b));
                                 System.out.println("reading keys");
                                 int strLength = lengthEncoding(fis, b);
+                                System.out.println("strLength == " + strLength);
                                 if (strLength == 1) {
                                     strLength = b & 00111111;
                                 }
