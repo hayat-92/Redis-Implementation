@@ -46,7 +46,7 @@ public class Client implements Runnable {
         int first2bits = b & 11000000;
         if (first2bits == 0) {
             System.out.println("00");
-            length = 1;
+            length = 0;
         } else if (first2bits == 128) {
             System.out.println("01");
             length = 2;
@@ -161,14 +161,15 @@ public class Client implements Runnable {
                                 System.out.println("value-type = " + b);
                                 b = fis.read();
                                 System.out.println("value-type = " + b);
-                                b = fis.read();
-                                System.out.println("value-type = " + b);
+//                                b = fis.read();
+//                                System.out.println("value-type = " + b);
                                 System.out.println(" b = " + Integer.toBinaryString(b));
                                 System.out.println("reading keys");
                                 int strLength = lengthEncoding(fis, b);
+                                b = fis.read();
                                 System.out.println("strLength == " + strLength);
-                                if (strLength == 1) {
-                                    strLength = b & 00111111;
+                                if (strLength == 0) {
+                                    strLength = b;
                                 }
                                 System.out.println("strLength == " + strLength);
                                 byte[] bytes = fis.readNBytes(strLength);
