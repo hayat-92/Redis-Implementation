@@ -147,8 +147,8 @@ public class Client implements Runnable {
                                     case 0xFB:
                                         System.out.println("RESIZEDB");
                                         b = fis.read();
-                                        fis.readNBytes(lengthEncoding(fis, b) - 1);
-                                        fis.readNBytes(lengthEncoding(fis, b) - 1);
+                                        fis.readNBytes(lengthEncoding(fis, b) );
+                                        fis.readNBytes(lengthEncoding(fis, b));
                                         break header;
                                     case 0xFA:
                                         System.out.println("AUX");
