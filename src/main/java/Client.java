@@ -159,7 +159,7 @@ public class Client implements Runnable {
                             // now key value pairs
                             while ((b = fis.read()) != -1) { // value type
                                 System.out.println("value-type = " + b);
-//                                b = fis.read();
+                                b = fis.read();
                                 b = fis.read();
                                 System.out.println(" b = " + Integer.toBinaryString(b));
                                 System.out.println("reading keys");
