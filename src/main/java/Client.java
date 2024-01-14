@@ -1,6 +1,7 @@
 import java.io.*;
 import java.net.Socket;
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -90,14 +91,37 @@ public class Client implements Runnable {
                             }
                         }
                         b = fis.read();
+                        boolean done = true;
                         System.out.println("header done");
                         // now key value pairs
                         while ((b = fis.read()) != -1) { // value type
-                            if (b == 0xFF) {
-                                break;
-                            }
                             String key = "";
                             String value = "";
+                            long expireTimeMs = -1;
+                            if (b == 0xFF) {
+                                break;
+                            } else if (b == 0xFD) {
+                                // expire time
+                                System.out.println("expire seconds");
+                                byte[] bytes = fis.readNBytes(Integer.BYTES);
+                                ByteBuffer buffer = ByteBuffer.allocate(Long.BYTES);
+                                buffer.put(bytes);
+                                buffer.flip(); // need flip
+                                expireTimeMs = buffer.getInt() * 1000;
+                                fis.read();
+                            } else if (b == 0xFC) {
+                                // expire time  ms
+                                System.out.println("expire in ms");
+                                byte[] bytes = fis.readNBytes(Long.BYTES);
+                                ByteBuffer buffer = ByteBuffer.allocate(Long.BYTES)
+                                        .order(ByteOrder.LITTLE_ENDIAN);
+                                buffer.put(bytes);
+                                buffer.flip(); // need flip
+                                expireTimeMs = buffer.getLong();
+                                fis.read();
+                            } else if (!done) {
+                                done = true;
+                            }
                             System.out.println("value-type = " + b);
 //                            b = fis.read(); // but why ????
                             b = fis.read();
@@ -124,6 +148,9 @@ public class Client implements Runnable {
                             System.out.println("key = " + key + ".");
                             System.out.println("value = " + value + ".");
                             map.put(key, value);
+                            if (expireTimeMs != -1) {
+                                expireMap.put(key, expireTimeMs);
+                            }
                         }
                     }
                 }
