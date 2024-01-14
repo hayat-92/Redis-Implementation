@@ -113,7 +113,7 @@ public class Client implements Runnable {
                             out.flush();
                         }
 
-                    }else if (command.equals("keys")) {
+                    } else if (command.equals("keys")) {
                         // *2 $4 keys $1 *
                         String dir = Main.config.get("dir");
                         String dbfilename = Main.config.get("dbfilename");
@@ -170,6 +170,8 @@ public class Client implements Runnable {
                                 break;
                             }
                         }
+                        out.printf("*1\r\n$%d\r\n%s\r\n", key.length(), key);
+                        out.flush();
                     }
                     elements.clear();
                     elementCount = 0;
