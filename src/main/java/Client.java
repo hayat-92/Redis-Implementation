@@ -98,7 +98,7 @@ public class Client implements Runnable {
                             String key = "";
                             String value = "";
                             System.out.println("value-type = " + b);
-                            b = fis.read(); // but why ????
+//                            b = fis.read(); // but why ????
                             b = fis.read();
                             System.out.println(" b = " + Integer.toBinaryString(b));
                             System.out.println("reading keys");
