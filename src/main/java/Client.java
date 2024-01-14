@@ -171,7 +171,7 @@ public class Client implements Runnable {
 
                     } else if (command.equals("keys")) {
                         // *2 $4 keys $1 *
-                        out.printf("*1\r\n");
+                        out.printf("*%d\r\n", map.size());
                         for (String key : map.keySet()) {
                             out.printf("$%d\r\n%s\r\n", key.length(), key);
                         }
